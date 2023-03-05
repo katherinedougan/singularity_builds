@@ -46,7 +46,6 @@
         - gffread
         - seqkit
         - seqtk
-        - seq
         - trimmomatic
     Scripts:
         - fasta-splitter.pl
