@@ -54,7 +54,7 @@
 ### search_toolkit_03032023.def
     - ncbi-blast v2.2.31
     - diamond v2.1.4
-    - hmmer
+    - hmmer v3.3.2
     - hhsuite v3.3.0
     - mmseqs2 v14-7e284
 
