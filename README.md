@@ -6,7 +6,7 @@
 1. Set up virtual machine with Ubuntu >=18.04
 
 
-2. Install Singularity and GO (see ##)
+2. Install Singularity and GO - see [Singularity installation documentation](https://docs.sylabs.io/guides/3.0/user-guide/installation.html)
 
 
 3. Build a sandbox that you can log into via the terminal and troubleshoot the software installation, using a docker image as your starting OS.
@@ -16,8 +16,8 @@
     sudo singularity shell --writable SANDBOX_NAME
 ```
 4. Document successful software installation steps in a definition file (`.def`)
-    - Descriptions of the different build sections for a definition file: https://docs.sylabs.io/guides/main/user-guide/definition_files.html#files
-    - If you have many similar apps, it may be useful to install them as apps (see https://docs.sylabs.io/guides/main/user-guide/definition_files.html#scif-app-sections)
+    - Information on how to structure a `.def` file and the different sections can be found [here](https://docs.sylabs.io/guides/main/user-guide/definition_files.html#files).
+    - If you have many similar or lightweight programs to install (e.g., sequence mapping or alignment tools), it may be more efficient to install them as different apps within the same Singularity image as discussed [here](https://docs.sylabs.io/guides/main/user-guide/definition_files.html#scif-app-sections)
     
     
 5. Once ready, build your final Singularity `.sif` image from the definition file.
