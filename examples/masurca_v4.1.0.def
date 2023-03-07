@@ -33,6 +33,7 @@ From: ubuntu:22.04
 ##############################
 
 %environment
+    export LC_ALL=C
     export PATH=$PATH:/software/masurca-4.1.0/bin
 
 %runscript
