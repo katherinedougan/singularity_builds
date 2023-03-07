@@ -16,18 +16,14 @@ From: ubuntu:22.04
 
 %post   
     apt update && DEBIAN_FRONTEND=noninteractive apt install -y wget gcc gawk curl g++ \
-        zlib1g-dev libbz2-dev make swig yaggo perl
-    mkdir /software && cd /software/
+        zlib1g-dev libbz2-dev make swig yaggo perl libboost-dev libboost-all-dev
 
-    cd /software
-    wget https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.tar.gz
-    tar xvzf boost_1_81_0.tar.gz && cd boost_1_81_0
-    ./bootstrap.sh --prefix=/software/boost_1_81_0
-    ./b2
-
+    mkdir /software
+    cd /software/
     wget https://github.com/alekseyzimin/masurca/releases/download/v4.1.0/MaSuRCA-4.1.0.tar.gz
+
     tar xvzf MaSuRCA-4.1.0.tar.gz && cd MaSuRCA-4.1.0
-    BOOST_ROOT=/software/boost_1_81_0 ./install.sh
+    DEST=/software/masurca-4.1.0 ./install.sh
     
     cd /software && apt autoremove && apt clean && rm *.gz
 
@@ -37,7 +33,7 @@ From: ubuntu:22.04
 ##############################
 
 %environment
-    export PATH=$PATH:/software/MaSuRCA-4.1.0/bin
+    export PATH=$PATH:/software/masurca-4.1.0/bin
 
 %runscript
     "$@"
