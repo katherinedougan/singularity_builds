@@ -75,9 +75,6 @@
 ### selection_toolkit_03032023.def
     - ete3 toolkit v3.1.2
     - PAML v4.10.6
-
-### orthofinder_v2.3_04032023.def
-    - orthofinder2 v#
-
-### masurca_v2.3_04032023.def
-    - masurca v#
+    
+### masurca_v4.1.0.def
+    - masurca_v4.1.0.def 
