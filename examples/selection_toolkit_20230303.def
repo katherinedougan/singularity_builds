@@ -19,33 +19,33 @@ From: ubuntu:18.04
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -yq install wget make gcc gawk bison libatlas-base-dev
     apt install -y qt4-dev-tools libqt4-dev libqtcore4 libqtgui4 python-qt4
 
-    cd /opt && wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.9.2-Linux-x86_64.sh
-    bash Miniconda3-py39_4.9.2-Linux-x86_64.sh -p /opt/miniconda3 -b
-    export PATH=$PATH:/opt/miniconda3/bin
-    /opt/miniconda3/bin/conda create -n ete3 -y
-    /opt/miniconda3/bin/conda config --add channels bioconda
-    /opt/miniconda3/bin/conda config --add channels etetoolkit
-    /opt/miniconda3/bin/conda config --add channels conda-forge
-    /opt/miniconda3/bin/conda install -n ete3 -y python=3 ete3 ete_toolchain
+    cd /software && wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.9.2-Linux-x86_64.sh
+    bash Miniconda3-py39_4.9.2-Linux-x86_64.sh -p /software/miniconda3 -b
+    export PATH=$PATH:/software/miniconda3/bin
+    /software/miniconda3/bin/conda create -n ete3 -y
+    /software/miniconda3/bin/conda config --add channels bioconda
+    /software/miniconda3/bin/conda config --add channels etetoolkit
+    /software/miniconda3/bin/conda config --add channels conda-forge
+    /software/miniconda3/bin/conda install -n ete3 -y python=3 ete3 ete_toolchain
 
     wget https://ftp.gnu.org/gnu/glibc/glibc-2.29.tar.gz && tar xvzf glibc-2.29.tar.gz
     cd glibc-2.29 && mkdir glibc-build/ && cd glibc-build
-    ../configure --prefix=/opt/glibc-2.29/glibc-build
+    ../configure --prefix=/software/glibc-2.29/glibc-build
     make && make install
 
-    cd /opt/ && wget https://github.com/abacus-gene/paml/releases/download/v4.10.6/paml-4.10.6-linux-X86_64.tgz
+    cd /software/ && wget https://github.com/abacus-gene/paml/releases/download/v4.10.6/paml-4.10.6-linux-X86_64.tgz
     tar -xzf paml-4.10.6-linux-X86_64.tgz && mkdir -p paml-4.10.6/bin && cd paml-4.10.6/bin && cp ../src/* . 
-    make -f Makefile LDFLAGS="-L/opt/glibc-2.29/glibc-build/lib" CFLAGS="-I/opt/glibc-2.29/glibc-build/include"
+    make -f Makefile LDFLAGS="-L/software/glibc-2.29/glibc-build/lib" CFLAGS="-I/software/glibc-2.29/glibc-build/include"
     rm *.o *.c *.h M* R*
 
-    cd /opt/
+    cd /software/
     wget https://s3.eu-central-1.amazonaws.com/tcoffee-packages/Stable/Latest/T-COFFEE_installer_Version_13.45.0.4846264_linux_x64.tar.gz
     tar xvzf T-COFFEE_installer_Version_13.45.0.4846264_linux_x64.tar.gz
 
-    cd /opt && wget https://www.ebi.ac.uk/goldman-srv/SLR/download/v1.3/slr_linux.tgz
-    tar xvzf slr_linux.tgz && mv slr/bin/Slr_shared /opt/miniconda3/envs/ete3/bin/Slr
+    cd /software && wget https://www.ebi.ac.uk/goldman-srv/SLR/download/v1.3/slr_linux.tgz
+    tar xvzf slr_linux.tgz && mv slr/bin/Slr_shared /software/miniconda3/envs/ete3/bin/Slr
 
-    cd /opt/ && rm *.gz *.tgz && rm -r slr
+    cd /software/ && rm *.gz *.tgz && rm -r slr
 
     conda clean -a -y
     apt autoremove && apt clean
@@ -56,12 +56,12 @@ From: ubuntu:18.04
 ##############################
 
 %environment
-    export PATH=$PATH:/opt/miniconda3/envs/ete3/bin
-    export PATH=$PATH:/opt/paml-4.10.6/bin
-    export PATH=$PATH:/opt/T-COFFEE_installer_Version_13.45.0.4846264_linux_x64/bin
+    export PATH=$PATH:/software/miniconda3/envs/ete3/bin
+    export PATH=$PATH:/software/paml-4.10.6/bin
+    export PATH=$PATH:/software/T-COFFEE_installer_Version_13.45.0.4846264_linux_x64/bin
 
 %startscript
-    source /opt/miniconda3/bin/activate ete3
+    source /software/miniconda3/bin/activate ete3
 
 %runscript
     "$@"
