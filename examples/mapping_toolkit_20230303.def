@@ -1,0 +1,170 @@
+##############################
+# SETUP
+##############################
+
+Bootstrap: docker
+From: ubuntu:20.04
+
+%labels
+    Author: Katherine Dougan
+    Email: k.dougan@uq.edu.au
+
+%files
+    ksw2_exts2_sse.c /opt/ksw2_exts2_sse.c
+
+
+##############################
+# INSTALL
+##############################
+
+%post   
+    apt update && DEBIAN_FRONTEND=noninteractive apt install -y wget make gcc apt-utils autoconf \
+        zlib1g-dev unzip g++ curl perl libbz2-dev liblzma-dev libncurses5-dev curl python-is-python3
+    export LC_ALL=C
+    mkdir /software
+
+    cd /software
+    wget https://github.com/samtools/samtools/releases/download/1.17/samtools-1.17.tar.bz2
+    bzip2 -d samtools-1.17.tar.bz2 && tar xvf samtools-1.17.tar && cd samtools-1.17
+    autoheader && autoconf -Wno-syntax && ./configure --prefix=/software/samtools-1.17
+    make && make install
+
+    cd /software
+    wget https://github.com/lh3/minimap2/archive/refs/tags/v2.24.tar.gz
+    tar xvzf v2.24.tar.gz && cp -a minimap2-2.24/ minimap2-2.24-modified && mv /opt/ksw2_exts2_sse.c minimap2-2.24-modified/
+    cd /software/minimap2-2.24/ && make
+    cd /software/minimap2-2.24-modified/ && make
+
+    cd /software
+    wget https://github.com/BenLangmead/bowtie2/releases/download/v2.5.1/bowtie2-2.5.1-linux-x86_64.zip
+    unzip bowtie2-2.5.1-linux-x86_64.zip
+
+    cd /software
+    wget https://github.com/DaehwanKimLab/hisat2/archive/refs/tags/v2.2.1.tar.gz
+    tar xvzf v2.2.1.tar.gz && cd hisat2-2.2.1 && make
+
+    cd /software
+    wget https://github.com/lh3/bwa/releases/download/v0.7.17/bwa-0.7.17.tar.bz2
+    bzip2 -d bwa-0.7.17.tar.bz2 && tar xvf bwa-0.7.17.tar && cd bwa-0.7.17 && make
+
+    cd /software
+    wget "https://sourceforge.net/projects/subread/files/subread-2.0.4/subread-2.0.4-Linux-x86_64.tar.gz"
+    tar xvzf subread-2.0.4-Linux-x86_64.tar.gz
+
+    cd /software/ && apt autoremove && apt clean
+    rm *.zip *.tar *.gz
+    cd /
+
+
+##############################
+# APPS - RUN COMMANDS
+##############################
+
+%apprun samtools
+    "$@"
+
+%apprun minimap2
+    "$@"
+
+%apprun minimap2_dino
+    "$@"
+
+%apprun bowtie2
+    "$@"
+
+%apprun hisat2
+    "$@"
+
+%apprun bwa
+    "$@"
+
+%apprun subread
+    "$@"
+
+%apprun all
+    "$@"
+
+%apprun all_dino
+    "$@"
+
+
+##############################
+# APPS - ENVIRONMENT
+##############################
+
+%appenv samtools
+    PROGRAM=samtools && export $PROGRAM
+    export PATH=$PATH:/software/samtools-1.17/bin
+
+%appenv minimap2
+    PROGRAM=minimap2 && export $PROGRAM
+    export PATH=$PATH:/software/minimap2-2.24
+
+%appenv minimap2_dino
+    PROGRAM=minimap2_dino && export $PROGRAM
+    export PATH=$PATH:/software/minimap2-2.24-modified
+
+%appenv bowtie2
+    PROGRAM=bowtie2 && export $PROGRAM
+    export PATH=$PATH:/software/bowtie2-2.5.1-linux-x86_64:/software/bowtie2-2.5.1-linux-x86_64/scripts
+
+%appenv hisat2
+    PROGRAM=hisat2 && export $PROGRAM
+    export PATH=$PATH:/software/hisat2-2.2.1:/software/hisat2-2.2.1/scripts
+
+%appenv bwa
+    PROGRAM=bwa && export $PROGRAM
+    export PATH=$PATH:/software/bwa-0.7.17
+
+%appenv subread
+    PROGRAM=subread && export $PROGRAM
+    export PATH=$PATH:/software/subread-2.0.4-Linux-x86_64/bin
+
+%appenv all
+    PROGRAM=all && export $PROGRAM
+    export PATH=$PATH:/software/samtools-1.17/bin
+    export PATH=$PATH:/software/minimap2-2.24
+    export PATH=$PATH:/software/bowtie2-2.5.1-linux-x86_64:/software/bowtie2-2.5.1-linux-x86_64/scripts
+    export PATH=$PATH:/software/hisat2-2.2.1:/software/hisat2-2.2.1/scripts
+    export PATH=$PATH:/software/bwa-0.7.17
+    export PATH=$PATH:/software/subread-2.0.4-Linux-x86_64/bin
+
+%appenv all_dino
+    PROGRAM=all_dino && export $PROGRAM
+    export PATH=$PATH:/software/samtools-1.17/bin
+    export PATH=$PATH:/software/minimap2-2.24-modified
+    export PATH=$PATH:/software/bowtie2-2.5.1-linux-x86_64:/software/bowtie2-2.5.1-linux-x86_64/scripts
+    export PATH=$PATH:/software/hisat2-2.2.1:/software/hisat2-2.2.1/scripts
+    export PATH=$PATH:/software/bwa-0.7.17
+    export PATH=$PATH:/software/subread-2.0.4-Linux-x86_64/bin
+
+
+##############################
+# GLOBAL OPTIONS
+##############################
+
+%environment
+    export LC_ALL=C
+
+%help
+
+############################################################################################
+
+    PROGRAMS:
+
+        samtools        v1.17
+        minimap2        v2.24
+        minimap2_dino   v2.24 (modified for dinoflagellate non-canonical splice sites)
+        bowtie2         v2.5.1
+        hisat2          v2.2.1
+        bwa             v0.7.17
+        subread         v2.0.4
+
+        all             minimap2, bowtie2, hisat2, bwa, subread
+        all_dino        minimap2_dino, bowtie2, hisat2, bwa, subread
+
+    COMMANDS:
+
+        singularity run --app [PROGRAM] mapping_toolkit_03032023.sif [COMMANDS]
+
+############################################################################################
