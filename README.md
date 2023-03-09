@@ -29,7 +29,9 @@
 --- 
 ## Example Singularity definition files
 
-### alignment_toolkit_03032023.def
+### Toolkits
+
+#### alignment_toolkit_20230303.def
     - mafft v7.505
     - trimal v1.4
     - pal2nal v14
@@ -37,7 +39,7 @@
     - mummer v4.0.0rc1
     - fastani v1.33
     
-### bioinformatics_potpourri_04032023.def
+#### bioinformatics_potpourri_20230304.def
     Programs:
         - bbmap
         - csvtk
@@ -51,14 +53,14 @@
         - fasta-splitter.pl
         - removesmalls.pl
     
-### search_toolkit_03032023.def
+#### search_toolkit_20230303.def
     - ncbi-blast v2.2.31
     - diamond v2.1.4
     - hmmer v3.3.2
     - hhsuite v3.3.0
     - mmseqs2 v14-7e284
 
-### mapping_toolkit_03032023.def
+#### mapping_toolkit_20230303.def
     - samtools v1.17
     - minimap2 v2.24
     - minimap2_dino v2.24 <- minimap2 modified for non-canonical dinoflagellate splice sites
@@ -67,14 +69,28 @@
     - bwa v0.7.17
     - subread v2.0.4
 
-### phylogenetics_toolkit_03032023.def
+#### phylogenetics_toolkit_20230303.def
     - iqtree2 v2.1.2
     - fasttree v2.1.11
     - physortR v1.0.8
     
-### selection_toolkit_03032023.def
+#### selection_toolkit_20230303.def
     - ete3 toolkit v3.1.2
     - PAML v4.10.6
-    
+
+## Program-specific singularity images  
+
+### checkv_20230309.def
+    - checkv v1.0.1
+
+### deepvirfinder_20230308.def
+    - deepvirfinder (pulled from GitHub on 20230308)
+
+### genomad_20230309.def
+    - geNomad v1.5.0 
+
 ### masurca_v4.1.0.def
-    - masurca_v4.1.0.def 
+    - masurca v4.1.0
+
+### vrhyme_20230309.def
+    - vRhyme v1.1.0 
