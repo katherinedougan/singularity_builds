@@ -1,0 +1,72 @@
+##############################
+# SETUP
+##############################
+
+Bootstrap: docker
+From: ubuntu:22.04
+
+%labels
+    Author: Katherine Dougan
+    Email: k.dougan@uq.edu.au
+
+
+##############################
+# INSTALL 
+##############################
+
+%post
+
+    export LC_ALL=C
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -yq install \
+        apt-utils wget git python3-pip gcc make
+    #make gcc gawk bison libatlas-base-dev
+
+    mkdir /software && cd /software
+    wget https://repo.anaconda.com/miniconda/Miniconda3-py39_23.1.0-1-Linux-x86_64.sh
+    bash Miniconda3-py39_23.1.0-1-Linux-x86_64.sh -p /software/miniconda3 -b
+    export PATH=$PATH:/software/miniconda3/bin
+
+    /software/miniconda3/bin/conda install -c bioconda python=3 samtools mash mummer mmseqs2 bowtie2 bwa
+
+    cd /software
+    git clone https://github.com/hyattpd/Prodigal.git
+    wget https://github.com/AnantharamanLab/vRhyme/archive/refs/tags/v1.1.0.tar.gz
+    tar xvzf v1.1.0.tar.gz
+
+    cd Prodigal/ && make && cd ../vRhyme-1.1.0/ && pip3 install .
+    
+    cd /software/ && rm *.gz
+
+    conda clean -a -y
+    apt autoremove && apt clean
+
+
+##############################
+# RUNSCRIPT &
+##############################
+
+%environment
+    export PATH=$PATH:/software/miniconda3/bin
+    export PATH=$PATH:/software/vRhyme-1.1.0
+    export PATH=$PATH:/software/vRhyme-1.1.0/build/scripts
+
+%runscript
+    "$@"
+
+%help
+
+############################################################################################
+
+    PROGRAMS:
+
+        vRhyme      v1.1.0
+
+    COMMANDS:
+
+        # Note: You need to bind all directories required on the host
+        # system to the /tmp directory in the singularity container
+        export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
+
+        singularity run vrhyme_20230309.sif [COMMANDS]
+
+############################################################################################
