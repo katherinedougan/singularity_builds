@@ -1,0 +1,56 @@
+##############################
+# SETUP
+##############################
+
+Bootstrap: docker
+From: ubuntu:20.04
+
+%labels
+    Author: Katherine Dougan
+    Email: k.dougan@uq.edu.au
+
+
+##############################
+# INSTALL 
+##############################
+
+%post   
+    export LC_ALL=C
+    apt update && DEBIAN_FRONTEND=noninteractive apt install -y wget git
+    mkdir /software/ && cd /software/
+
+    wget https://repo.anaconda.com/miniconda/Miniconda3-py38_23.1.0-1-Linux-x86_64.sh
+    bash Miniconda3-py38_23.1.0-1-Linux-x86_64.sh -b -p /software/miniconda3
+
+    miniconda3/bin/conda install -c conda-forge -c bioconda virsorter=2
+
+    apt autoremove && apt clean && miniconda3/bin/conda clean -a -y
+
+
+##############################
+# RUNSCRIPT
+##############################
+
+%environment
+    export PATH=$PATH:/software/miniconda3/bin
+
+%runscript
+    "$@"
+
+%help
+
+############################################################################################
+
+    PROGRAMS:
+
+        virsorter2      v2.2.4
+
+    COMMANDS:
+
+        # Note: You need to bind all directories required on the host
+        # system to the /tmp directory in the singularity container
+        export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
+
+        singularity run virsorter2_20230310.sif [COMMANDS]
+
+############################################################################################
