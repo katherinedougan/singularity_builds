@@ -1,0 +1,148 @@
+##############################
+# SETUP
+##############################
+
+Bootstrap: docker
+From: ubuntu:20.04
+
+%labels
+    Author: Katherine Dougan
+    Email: k.dougan@uq.edu.au
+
+%files
+    profiles.tar /opt/profiles.tar
+
+##############################
+# INSTALL PROGRAMS 
+##############################
+
+%post   
+    export LC_ALL=C
+    apt update && DEBIAN_FRONTEND=noninteractive apt install -y wget git python-is-python3
+    mkdir /software && cd /software/
+
+    wget https://repo.anaconda.com/miniconda/Miniconda3-py38_23.1.0-1-Linux-x86_64.sh
+    bash Miniconda3-py38_23.1.0-1-Linux-x86_64.sh -b -p /software/miniconda3
+
+    /software/miniconda3/bin/conda install -n base -c conda-forge mamba -y
+    /software/miniconda3/bin/mamba create -c conda-forge -c bioconda \
+        -n snakemake snakemake blast csvtk python-igraph numpy -y
+
+    cd /software/
+    git clone https://github.com/apcamargo/bioinformatics-snakemake-pipelines.git
+
+    cd bioinformatics-snakemake-pipelines/
+    for dir in contig-* genome-*; do
+        sed -i "s|scripts/|/software/bioinformatics-snakemake-pipelines/$dir/scripts/|g" $dir/$dir.smk
+    done
+
+    mv /opt/profiles.tar . && tar xvf profiles.tar && rm profiles.tar
+
+
+##############################
+# APPS - RUN COMMANDS
+##############################
+
+%apprun contig-aai
+    "$@"
+
+%apprun contig-ani-greedy
+    "$@"
+
+%apprun contig-ani-leiden
+    "$@"
+
+%apprun genome-aai
+    "$@"
+
+%apprun genome-ani-greedy
+    "$@"
+
+%apprun genome-ani-leiden
+    "$@"
+
+%apprun protein-diamond
+    "$@"
+
+%apprun protein-mmseqs2
+    "$@"
+
+
+##############################
+# APPS - ENVIRONMENT
+##############################
+
+%appenv contig-aai
+    PROGRAM=contig-aai && export PROGRAM
+    export PATH=$PATH:/software/bioinformatics-snakemake-pipelines/contig-aai-pipeline
+    export SNAKEMAKE_PROFILE=/software/bioinformatics-snakemake-pipelines/profiles/profile1
+    
+%appenv contig-ani-greedy
+    PROGRAM=contig-ani-greedy && export PROGRAM
+    export PATH=$PATH:/software/bioinformatics-snakemake-pipelines/contig-ani-greedy-clustering-pipeline
+    export SNAKEMAKE_PROFILE=/software/bioinformatics-snakemake-pipelines/profiles/profile2
+
+%appenv contig-ani-leiden
+    PROGRAM=contig-ani-leiden && export PROGRAM
+    export PATH=$PATH:/software/bioinformatics-snakemake-pipelines/contig-ani-leiden-clustering-pipeline
+    export SNAKEMAKE_PROFILE=/software/bioinformatics-snakemake-pipelines/profiles/profile3
+
+%appenv genome-aai
+    export PATH=$PATH:/software/miniconda3/envs/vibrant/bin
+    export SNAKEMAKE_PROFILE=/software/bioinformatics-snakemake-pipelines/profiles/profile4
+
+%appenv genome-ani-greedy
+    PROGRAM=genome-ani-greedy && export PROGRAM
+    export PATH=$PATH:/software/bioinformatics-snakemake-pipelines/genome-ani-greedy-clustering-pipeline
+    export SNAKEMAKE_PROFILE=/software/bioinformatics-snakemake-pipelines/profiles/profile5
+
+%appenv genome-ani-leiden
+    PROGRAM=genome-ani-leiden && export PROGRAM
+    export PATH=$PATH:/software/bioinformatics-snakemake-pipelines/genome-ani-leiden-clustering-pipeline
+    export SNAKEMAKE_PROFILE=/software/bioinformatics-snakemake-pipelines/profiles/profile6
+  
+%appenv protein-diamond
+    PROGRAM=protein-diamond && export PROGRAM
+    export PATH=$PATH:/software/bioinformatics-snakemake-pipelines/protein-clustering
+    export SNAKEMAKE_PROFILE=/software/bioinformatics-snakemake-pipelines/profiles/profile7
+
+%appenv protein-mmseqs2
+    PROGRAM=protein-mmseqs2 && export PROGRAM
+    export PATH=$PATH:/software/bioinformatics-snakemake-pipelines/protein-clustering
+    export SNAKEMAKE_PROFILE=/software/bioinformatics-snakemake-pipelines/profiles/profile8
+
+
+##############################
+# GLOBAL OPTIONS
+##############################
+
+%environment
+    export LC_ALL=C
+    source /software/miniconda3/bin/activate snakemake
+    export PATH=$PATH:/software/miniconda3/envs/snakemake/bin
+
+%help
+
+#################################################################################################
+
+    PROGRAMS:
+
+        contig-aai
+        contig-ani-greedy
+        contig-ani-leiden
+        genome-aai
+        genome-ani-greedy
+        genome-ani-leiden
+        protein-diamond
+        protein-mmseqs2
+
+    COMMANDS:
+
+        # Note: You need to bind all directories required on the host
+        # system to the /tmp directory in the singularity container
+
+        export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
+
+        singularity run --app [PROGRAM] metagenomics_clustering_pipeline_20230309.sif [PARAMETERS]
+            
+#################################################################################################
