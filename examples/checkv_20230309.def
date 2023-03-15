@@ -50,10 +50,10 @@ From: ubuntu:22.04
 
     COMMANDS:
 
-        # Note: You need to bind all directories required on the host
-        # system to the /tmp directory in the singularity container
-        export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
-
+        export APPTAINER_BIND="DIR:/tmp"
         singularity run checkv_20230309.sif [COMMANDS]
+
+        # CheckV help menu
+        singularity run checkv_20230309.sif checkv -h
 
 ############################################################################################

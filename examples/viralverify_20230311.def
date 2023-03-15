@@ -1,0 +1,62 @@
+##############################
+# SETUP
+##############################
+
+Bootstrap: docker
+From: ubuntu:22.04
+
+%labels
+    Author: Katherine Dougan
+    Email: k.dougan@uq.edu.au
+
+##############################
+# INSTALL PROGRAMS 
+##############################
+
+%post   
+    apt update && DEBIAN_FRONTEND=noninteractive apt install -y wget make cmake gcc git python3 python3-pip
+    mkdir /software
+
+    cd /software
+    wget http://eddylab.org/software/hmmer/hmmer.tar.gz
+    tar xvzf hmmer.tar.gz && cd hmmer-3.3.2/
+    ./configure --prefix=/software/hmmer-3.3.2 && make && make install
+
+    cd /software 
+    git clone https://github.com/hyattpd/Prodigal
+	cd Prodigal && make && mv prodigal /usr/local/bin/
+
+	cd /software
+	git clone https://github.com/ablab/viralVerify
+
+    cd /software && apt autoremove && apt clean && rm *.gz
+
+
+##############################
+# RUNSCRIPT 
+##############################
+
+%environment
+    export LC_ALL=C
+    export PATH=$PATH:/software/hmmer-3.3.2/bin
+    export PATH=$PATH:/software/viralVerify
+    export PATH=$PATH:/software/viralVerify/bin
+    export PATH=$PATH:/software/viralVerify/scripts
+
+%runscript
+    "$@"
+
+%help
+
+############################################################################################
+
+    PROGRAMS:
+
+        viralVerify		    v1.1
+
+    COMMANDS:
+
+        singularity run viralverify_20230311.sif [COMMANDS]
+
+############################################################################################
+ 

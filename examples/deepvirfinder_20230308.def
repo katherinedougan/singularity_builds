@@ -16,11 +16,18 @@ From: ubuntu:20.04
 
 %post   
     export LC_ALL=C
-    apt update && DEBIAN_FRONTEND=noninteractive apt install -y apt-utils wget git python3 python3-pip python-is-python3
-    mkdir /software && cd /software/
+    apt update
+    DEBIAN_FRONTEND=noninteractive apt install -y git software-properties-common
+    DEBIAN_FRONTEND=noninteractive add-apt-repository ppa:deadsnakes/ppa -y
+    apt update
+    DEBIAN_FRONTEND=noninteractive apt install -y python3.6 python3.6-dev python3-pip python3.6-distutils
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1
+    update-alternatives --install /usr/bin/python python /usr/bin/python3.6 1
+    pip3 install numpy==1.19.5 theano==1.0.3 keras==2.2.4 scikit-learn==0.24.2 biopython==1.79 h5py==2.10.0
 
-    pip3 install numpy theano==1.0.3 keras==2.2.4 scikit-learn biopython h5py
-    cd /software/ && git clone https://github.com/jessieren/DeepVirFinder && chmod 777 DeepVirFinder/*
+    mkdir /software && cd /software/
+    git clone https://github.com/jessieren/DeepVirFinder && chmod 777 DeepVirFinder/*
+    sed -i 's|print("   model directory {}".format(modDir))||' DeepVirFinder/dvf.py
 
     apt autoremove && apt clean
 
@@ -42,10 +49,12 @@ From: ubuntu:20.04
 
     PROGRAMS:
 
-        DeepVirFinder    v3.1.2
+        DeepVirFinder
 
     COMMANDS:
 
-        singularity run deepvirfinder_08032023.sif [COMMANDS]
+        # CheckV help menu
+        singularity run deepvirfinder_20230308.sif [COMMANDS]
 
 ############################################################################################
+ 
