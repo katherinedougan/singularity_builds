@@ -1,0 +1,47 @@
+##############################
+# SETUP
+##############################
+
+Bootstrap: docker
+From: jiarong/virsorter:2.2.3
+
+%labels
+    Author: Katherine Dougan
+    Email: k.dougan@uq.edu.au
+
+
+##############################
+# INSTALL 
+##############################
+
+%post   
+    export LC_ALL=C
+
+
+##############################
+# RUNSCRIPT
+##############################
+
+%environment
+
+%runscript
+    "$@"
+
+%help
+
+############################################################################################
+
+    PROGRAMS:
+
+        virsorter2      v2.2.3
+
+    COMMANDS:
+
+        export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
+        singularity run virsorter2_20230310.sif [COMMANDS]
+
+        # VirSorter2 help menu
+        singularity run virsorter2_20230310.sif virsorter -h
+
+############################################################################################
+ 
