@@ -1,0 +1,35 @@
+##############################
+# SETUP
+##############################
+
+Bootstrap: docker
+From: ecogenomic/gtdbtk:2.3.0
+
+%labels
+    Author: Katherine Dougan
+    Email: k.dougan@uq.edu.au
+
+##############################
+# RUNSCRIPT
+##############################
+
+%environment
+    export LC_ALL=C
+
+%help
+
+############################################################################################
+
+    PROGRAMS:
+
+        gtdbtk      v2.3.0
+
+    COMMANDS:
+
+        # Note: You need to bind all directories required on the host
+        # system to the /tmp directory in the singularity container
+        export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
+
+        singularity run gtdbtk_v2.3.0.sif [COMMANDS]
+
+############################################################################################
