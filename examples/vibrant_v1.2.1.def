@@ -3,7 +3,7 @@
 ##############################
 
 Bootstrap: docker
-From: jiarong/virsorter:2.2.3
+From: ubuntu:22.04
 
 %labels
     Author: Katherine Dougan
@@ -66,14 +66,13 @@ From: jiarong/virsorter:2.2.3
 
     PROGRAMS:
 
-        vibrant      v1.2.1
+        VIBRANT      v1.2.1
 
-    COMMANDS:
+    INSTRUCTIONS:
 
-        # Note: You need to bind all directories required on the host
-        # system to the /tmp directory in the singularity container
+        # bind all directories used on the host system to the container before running
         export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
-
-        singularity run vibrant_20230310.sif [COMMANDS]
+        singularity run vibrant_v1.2.1.sif [...]
 
 ############################################################################################
+ 

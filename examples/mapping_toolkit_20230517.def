@@ -10,7 +10,7 @@ From: ubuntu:20.04
     Email: k.dougan@uq.edu.au
 
 %files
-    ksw2_exts2_sse.c /opt/ksw2_exts2_sse.c
+    minimap2-2.24-modified.tgz /opt/minimap2-2.24-modified.tgz
 
 
 ##############################
@@ -18,42 +18,33 @@ From: ubuntu:20.04
 ##############################
 
 %post   
-    apt update && DEBIAN_FRONTEND=noninteractive apt install -y wget make gcc apt-utils autoconf \
-        zlib1g-dev unzip g++ curl perl libbz2-dev liblzma-dev libncurses5-dev curl python-is-python3
+    apt update && DEBIAN_FRONTEND=noninteractive apt install -y wget make gcc gcc-9 apt-utils autoconf git libcurl4-openssl-dev \
+        zlib1g-dev unzip g++ g++-9 curl perl libbz2-dev liblzma-dev libncurses5-dev curl python-is-python3 bzip2
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+
     export LC_ALL=C
-    mkdir /software
+    mkdir -p /software/tmp && cd /software/tmp/
 
-    cd /software
-    wget https://github.com/samtools/samtools/releases/download/1.17/samtools-1.17.tar.bz2
-    bzip2 -d samtools-1.17.tar.bz2 && tar xvf samtools-1.17.tar && cd samtools-1.17
-    autoheader && autoconf -Wno-syntax && ./configure --prefix=/software/samtools-1.17
-    make && make install
-
-    cd /software
-    wget https://github.com/lh3/minimap2/archive/refs/tags/v2.24.tar.gz
-    tar xvzf v2.24.tar.gz && cp -a minimap2-2.24/ minimap2-2.24-modified && mv /opt/ksw2_exts2_sse.c minimap2-2.24-modified/
-    cd /software/minimap2-2.24/ && make
-    cd /software/minimap2-2.24-modified/ && make
-
-    cd /software
-    wget https://github.com/BenLangmead/bowtie2/releases/download/v2.5.1/bowtie2-2.5.1-linux-x86_64.zip
-    unzip bowtie2-2.5.1-linux-x86_64.zip
-
-    cd /software
-    wget https://github.com/DaehwanKimLab/hisat2/archive/refs/tags/v2.2.1.tar.gz
-    tar xvzf v2.2.1.tar.gz && cd hisat2-2.2.1 && make
-
-    cd /software
-    wget https://github.com/lh3/bwa/releases/download/v0.7.17/bwa-0.7.17.tar.bz2
-    bzip2 -d bwa-0.7.17.tar.bz2 && tar xvf bwa-0.7.17.tar && cd bwa-0.7.17 && make
-
-    cd /software
     wget "https://sourceforge.net/projects/subread/files/subread-2.0.4/subread-2.0.4-Linux-x86_64.tar.gz"
-    tar xvzf subread-2.0.4-Linux-x86_64.tar.gz
+    wget https://github.com/lh3/bwa/releases/download/v0.7.17/bwa-0.7.17.tar.bz2
+    wget https://github.com/DaehwanKimLab/hisat2/archive/refs/tags/v2.2.1.tar.gz
+    wget https://github.com/BenLangmead/bowtie2/releases/download/v2.5.1/bowtie2-2.5.1-linux-x86_64.zip
+    wget https://github.com/lh3/minimap2/archive/refs/tags/v2.24.tar.gz
+    wget https://github.com/samtools/samtools/archive/refs/tags/1.17.tar.gz
+    git clone https://github.com/samtools/htslib.git
+    cp /opt/minimap2-2.24-modified.tgz /software/tmp/minimap2-2.24-modified.tgz
 
-    cd /software/ && apt autoremove && apt clean
-    rm *.zip *.tar *.gz
-    cd /
+    cd htslib && git submodule update --init --recursive && make && make install && cd ../
+    tar xvzf 1.17.tar.gz --directory ../ && cd ../samtools-1.17/ && autoreconf && ./configure && make && make install && cd ../tmp/
+    tar xvzf v2.24.tar.gz --directory ../ && cd ../minimap2-2.24/ && make && cd ../tmp/
+    tar xvzf minimap2-2.24-modified.tgz --directory ../ && cd ../minimap2-2.24-modified/ && make && cd ../tmp/
+    tar xvzf v2.2.1.tar.gz --directory ../ && cd ../hisat2-2.2.1 && make && cd ../tmp/
+    bzip2 -d bwa-0.7.17.tar.bz2 && tar xvf bwa-0.7.17.tar --directory ../ && cd ../bwa-0.7.17/ && make && cd ../tmp/
+    tar xvzf subread-2.0.4-Linux-x86_64.tar.gz --directory ../
+    unzip bowtie2-2.5.1-linux-x86_64.zip -d ../
+
+    cd / && rm -r /software/tmp/ && apt autoremove && apt clean
 
 
 ##############################
@@ -163,8 +154,11 @@ From: ubuntu:20.04
         all             minimap2, bowtie2, hisat2, bwa, subread
         all_dino        minimap2_dino, bowtie2, hisat2, bwa, subread
 
-    COMMANDS:
+    INSTRUCTIONS:
 
-        singularity run --app [PROGRAM] mapping_toolkit_03032023.sif [COMMANDS]
+        # bind all directories used on the host system to the container before running
+        export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
+        singularity run --app [PROGRAM] mapping_toolkit_03032023.sif [...]
 
 ############################################################################################
+ 

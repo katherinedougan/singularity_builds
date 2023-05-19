@@ -1,0 +1,65 @@
+##############################
+# SETUP
+##############################
+
+Bootstrap: docker
+From: ubuntu:18.04
+
+%labels
+    Author: Katherine Dougan
+    Email: k.dougan@uq.edu.au
+
+
+##############################
+# INSTALL 
+##############################
+
+%post
+
+    export LC_ALL=C
+    apt update && DEBIAN_FRONTEND=noninteractive apt install -y git wget 
+    mkdir /software && cd /software
+
+    ##### Plasforest
+    wget https://repo.anaconda.com/miniconda/Miniconda3-py39_23.1.0-1-Linux-x86_64.sh
+    bash Miniconda3-py39_23.1.0-1-Linux-x86_64.sh -p /software/miniconda3 -b
+    /software/miniconda3/bin/conda install python==3.8
+    /software/miniconda3/bin/conda install -c conda-forge numpy pandas scikit-learn==0.22.1
+    /software/miniconda3/bin/conda install -c bioconda biopython
+    git clone https://github.com/leaemiliepradier/PlasForest && cd PlasForest && chmod 755 * && cd ..
+
+    ##### NCBI-BLAST
+    wget https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.10.1/ncbi-blast-2.10.1+-x64-linux.tar.gz
+    tar xvzf ncbi-blast-2.10.1+-x64-linux.tar.gz && mv ncbi-blast-2.10.1+/bin/* /usr/local/bin/ && rm -r ncbi-blast-2.10.1+/
+
+    rm *.gz && apt autoremove && apt autoremove && apt clean
+
+
+##############################
+# RUNSCRIPT 
+##############################
+
+%environment
+    export LC_ALL=C
+    export PATH=$PATH:/software/miniconda3/bin
+    export PATH=$PATH:/software/PlasForest
+
+%runscript
+    "$@"
+
+%help
+
+############################################################################################
+
+    PROGRAMS:
+
+        plasforest     (downloaded from GitHub on 2023-05-15)
+
+    INSTRUCTIONS:
+
+        # bind all directories used on the host system to the container before running
+        export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
+        singularity run plasforest_20230515.sif [...]
+
+############################################################################################
+ 

@@ -42,7 +42,7 @@ From: ubuntu:22.04
 
 
 ##############################
-# RUNSCRIPT &
+# RUNSCRIPT
 ##############################
 
 %environment
@@ -61,12 +61,11 @@ From: ubuntu:22.04
 
         vRhyme      v1.1.0
 
-    COMMANDS:
+    INSTRUCTIONS:
 
-        # Note: You need to bind all directories required on the host
-        # system to the /tmp directory in the singularity container
+        # bind all directories used on the host system to the container before running
         export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
-
-        singularity run vrhyme_20230309.sif [COMMANDS]
+        singularity run vrhyme_v1.1.0.sif [COMMANDS]
 
 ############################################################################################
+ 

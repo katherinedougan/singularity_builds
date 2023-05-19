@@ -1,0 +1,55 @@
+##############################
+# SETUP
+##############################
+
+Bootstrap: docker
+From: ubuntu:22.04
+
+%labels
+    Author: Katherine Dougan
+    Email: k.dougan@uq.edu.au
+
+
+##############################
+# INSTALL 
+##############################
+
+%post
+
+    export LC_ALL=C
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt -yq install wget gcc g++ cmake libbz2-dev \
+        zlib1g-dev python3 python-is-python3
+    mkdir -p /software/tmp/ && cd /software/tmp/
+
+    wget https://github.com/ablab/spades/releases/download/v3.15.5/SPAdes-3.15.5.tar.gz
+    tar xvzf SPAdes-3.15.5.tar.gz --directory ../ && cd ../SPAdes-3.15.5/ && ./spades_compile.sh && cd ../
+
+    rm -r /software/tmp/ && apt autoremove && apt clean
+
+
+##############################
+# RUNSCRIPT
+##############################
+
+%environment
+    export PATH=$PATH:/software/SPAdes-3.15.5/bin/
+
+%runscript
+    "$@"
+
+%help
+
+############################################################################################
+
+    PROGRAMS:
+
+        spades      v3.15.5
+
+    INSTRUCTIONS:
+
+        # bind all directories used on the host system to the container before running
+        export APPTAINER_BIND="DIR:/tmp"
+        singularity run spades_v3.15.5.sif checkv [...]
+
+############################################################################################
+ 

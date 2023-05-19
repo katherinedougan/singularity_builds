@@ -1,0 +1,108 @@
+##############################
+# SETUP
+##############################
+
+Bootstrap: docker
+From: ubuntu:20.04
+
+%labels
+    Author: Katherine Dougan
+    Email: k.dougan@uq.edu.au
+
+
+##############################
+# INSTALL 
+##############################
+
+%post   
+    export LC_ALL=C
+    apt update && DEBIAN_FRONTEND=noninteractive apt install -y wget make git gnutls-bin cmake perl g++ \
+        rsync libssl-dev openssl uuid-dev gcc gcc-9 libmariadb-dev-compat libmariadb-dev g++ autoconf unzip \
+        libcurl4-openssl-dev libpng-dev curl r-base r-cran-phytools r-cran-ape apt-utils zlib1g-dev g++-9
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+
+    mkdir -p /software/tmp && cd /software/tmp/
+
+    wget https://cran.r-project.org/src/contrib/PhySortR_1.0.8.tar.gz
+    wget https://github.com/soedinglab/hh-suite/archive/refs/tags/v3.3.0.tar.gz
+    wget http://eddylab.org/software/hmmer/hmmer.tar.gz
+    wget https://github.com/soedinglab/MMseqs2/archive/refs/tags/14-7e284.tar.gz
+    wget https://github.com/weizhongli/cdhit/archive/refs/tags/V4.8.1.tar.gz
+    wget https://mafft.cbrc.jp/alignment/software/mafft-7.505-without-extensions-src.tgz
+    wget https://github.com/mummer4/mummer/releases/download/v4.0.0rc1/mummer-4.0.0rc1.tar.gz
+    wget https://github.com/samtools/samtools/archive/refs/tags/1.17.tar.gz
+    wget "https://sourceforge.net/projects/subread/files/subread-2.0.4/subread-2.0.4-Linux-x86_64.tar.gz"
+    wget https://github.com/lh3/bwa/releases/download/v0.7.17/bwa-0.7.17.tar.bz2
+    wget https://github.com/DaehwanKimLab/hisat2/archive/refs/tags/v2.2.1.tar.gz
+    wget https://github.com/BenLangmead/bowtie2/releases/download/v2.5.1/bowtie2-2.5.1-linux-x86_64.zip
+    wget https://github.com/lh3/minimap2/archive/refs/tags/v2.24.tar.gz
+
+    git clone https://github.com/samtools/htslib.git
+
+    cd htslib && git submodule update --init --recursive && make && make install && cd ../
+    tar xvzf v2.2.1.tar.gz --directory ../ && cd ../hisat2-2.2.1/ && make && cd ../tmp/
+    tar xvzf hmmer.tar.gz && cd hmmer-3.3.2/ && ./configure && make && make install && cd ../
+    tar xvzf mummer-4.0.0rc1.tar.gz && cd mummer-4.0.0rc1 && ./configure && make && make install && ldconfig && cd ../
+    tar xvzf v3.3.0.tar.gz && cd hh-suite-3.3.0/ && cmake . && make && make install && cd ../
+    tar xvzf V4.8.1.tar.gz && cd cd-hit-4.8.1/ && make && make install && cd ../
+    tar xvzf mafft-7.505-without-extensions-src.tgz && cd mafft-7.505-without-extensions/core/ && make && make install && cd ../../
+    tar xvzf 14-7e284.tar.gz && cd MMseqs2-14-7e284/ && cmake . && make && make install && cd ../
+    bzip2 -d bwa-0.7.17.tar.bz2 && tar xvf bwa-0.7.17.tar --directory ../ && cd ../bwa-0.7.17 && make && cd ../tmp/
+    tar xvzf 1.17.tar.gz && cd samtools-1.17/ && autoreconf && ./configure && make && make install && cd ../
+    R CMD INSTALL PhySortR_1.0.8.tar.gz
+
+    tar xvzf v2.24.tar.gz --directory ../ && cd ../minimap2-2.24/ && make && cd ../tmp/
+    tar xvzf subread-2.0.4-Linux-x86_64.tar.gz --directory ../
+    unzip bowtie2-2.5.1-linux-x86_64.zip -d ../
+
+    cd /software/ && apt autoremove && apt clean && rm -r /software/tmp/
+
+
+##############################
+# RUNSCRIPT
+##############################
+
+%environment 
+
+    export LC_ALL=C
+    export PATH=$PATH:/software/trimal/source/
+    export PATH=$PATH:/software/bwa-0.7.17/
+    export PATH=$PATH:/software/minimap2-2.24
+    export PATH=$PATH:/software/subread-2.0.4-Linux-x86_64
+    export PATH=$PATH:/software/bowtie2-2.5.1-linux-x86_64/
+
+trimal
+
+%runscript
+    "$@"
+
+%help
+
+############################################################################################
+
+    PROGRAMS:
+
+        bwa                 v0.7.17
+        Bowtie2             v2.5.1
+        Hisat2              v2.2.1
+        hmmer               v3.3.2
+        MUMmer              v4.0.0rc1
+        HH-Suite            v3.3.0
+        CD-HIT              v4.8.1
+        MAFFT               v7.505
+        Minimap2            v2.24
+        MMSeqs2             v14-7e284
+        Samtools            v1.17
+        Subread             v2.0.4
+
+
+
+    INSTRUCTIONS:
+
+        # bind all directories used on the host system to the container before running
+        export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
+        singularity run bioinformatics_potpourri_20230517.sif [...]
+
+############################################################################################
+ 

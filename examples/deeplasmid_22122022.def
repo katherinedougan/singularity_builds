@@ -3,11 +3,20 @@
 ##############################
 
 Bootstrap: docker
-From: ecogenomic/gtdbtk:2.3.0
+From: billandreo/deeplasmid-cpu-ubuntu2
 
 %labels
     Author: Katherine Dougan
     Email: k.dougan@uq.edu.au
+
+
+##############################
+# INSTALL 
+##############################
+
+%post   
+    export LC_ALL=C
+
 
 ##############################
 # RUNSCRIPT
@@ -22,13 +31,13 @@ From: ecogenomic/gtdbtk:2.3.0
 
     PROGRAMS:
 
-        gtdbtk      v2.3.0
+        deeplasmid      22122022
 
-    INSTRUCTIONS:
+    COMMANDS:
 
         # bind all directories used on the host system to the container before running
         export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
-        singularity run gtdbtk_v2.3.0.sif gtdbtk [...]
+        singularity run deeplasmid_22122022.sif feature_DL_plasmid_predict.sh [FASTA] [OUTDIR]
 
 ############################################################################################
  

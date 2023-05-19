@@ -19,7 +19,14 @@ From: ubuntu:18.04
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -yq install wget make gcc gawk bison libatlas-base-dev
     apt install -y qt4-dev-tools libqt4-dev libqtcore4 libqtgui4 python-qt4
 
-    cd /software && wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.9.2-Linux-x86_64.sh
+    mkdir -p /software/tmp/ && cd /software/tmp/
+
+    wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.9.2-Linux-x86_64.sh
+    wget https://ftp.gnu.org/gnu/glibc/glibc-2.29.tar.gz
+    wget https://github.com/abacus-gene/paml/releases/download/v4.10.6/paml-4.10.6-linux-X86_64.tgz
+    wget https://s3.eu-central-1.amazonaws.com/tcoffee-packages/Stable/Latest/T-COFFEE_installer_Version_13.45.0.4846264_linux_x64.tar.gz
+    wget https://www.ebi.ac.uk/goldman-srv/SLR/download/v1.3/slr_linux.tgz
+
     bash Miniconda3-py39_4.9.2-Linux-x86_64.sh -p /software/miniconda3 -b
     export PATH=$PATH:/software/miniconda3/bin
     /software/miniconda3/bin/conda create -n ete3 -y
@@ -28,31 +35,18 @@ From: ubuntu:18.04
     /software/miniconda3/bin/conda config --add channels conda-forge
     /software/miniconda3/bin/conda install -n ete3 -y python=3 ete3 ete_toolchain
 
-    wget https://ftp.gnu.org/gnu/glibc/glibc-2.29.tar.gz && tar xvzf glibc-2.29.tar.gz
-    cd glibc-2.29 && mkdir glibc-build/ && cd glibc-build
-    ../configure --prefix=/software/glibc-2.29/glibc-build
-    make && make install
+    #cd glibc-2.29 && mkdir glibc-build/ && cd glibc-build
 
-    cd /software/ && wget https://github.com/abacus-gene/paml/releases/download/v4.10.6/paml-4.10.6-linux-X86_64.tgz
-    tar -xzf paml-4.10.6-linux-X86_64.tgz && mkdir -p paml-4.10.6/bin && cd paml-4.10.6/bin && cp ../src/* . 
-    make -f Makefile LDFLAGS="-L/software/glibc-2.29/glibc-build/lib" CFLAGS="-I/software/glibc-2.29/glibc-build/include"
-    rm *.o *.c *.h M* R*
-
-    cd /software/
-    wget https://s3.eu-central-1.amazonaws.com/tcoffee-packages/Stable/Latest/T-COFFEE_installer_Version_13.45.0.4846264_linux_x64.tar.gz
-    tar xvzf T-COFFEE_installer_Version_13.45.0.4846264_linux_x64.tar.gz
-
-    cd /software && wget https://www.ebi.ac.uk/goldman-srv/SLR/download/v1.3/slr_linux.tgz
+    tar xvzf T-COFFEE_installer_Version_13.45.0.4846264_linux_x64.tar.gz --directory ../
+    tar xvzf glibc-2.29.tar.gz && cd glibc-2.29/ && ../configure && make && make install && cd ../
+    tar -xvzf paml-4.10.6-linux-X86_64.tgz --directory ../ && cd ../paml-4.10.6/ && make && cd ../tmp
     tar xvzf slr_linux.tgz && mv slr/bin/Slr_shared /software/miniconda3/envs/ete3/bin/Slr
 
-    cd /software/ && rm *.gz *.tgz && rm -r slr
-
-    conda clean -a -y
-    apt autoremove && apt clean
+    cd /software/ && rm -r /software/tmp/ && conda clean -a -y && apt autoremove && apt clean
 
 
 ##############################
-# RUNSCRIPT &
+# RUNSCRIPT
 ##############################
 
 %environment
@@ -75,13 +69,14 @@ From: ubuntu:18.04
         ete3 toolkit    v3.1.2
         PAML            v4.10.6
 
-    COMMANDS:
+    INSTRUCTIONS:
 
-        To use the ete3 toolkit:
-        singularity run selection_toolkit_03032023.sif ete3 evol [COMMANDS]
+        # bind all directories used on the host system to the container before running
+        export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
 
         To run one of the PAML programs:
-        singularity run selection_toolkit_03032023.sif codeml [COMMANDS]
-        singularity run selection_toolkit_03032023.sif baseml [COMMANDS]
+        singularity run selection_toolkit_20230517.sif codeml [...]
+        singularity run selection_toolkit_20230517.sif baseml [...]
 
 ############################################################################################
+ 

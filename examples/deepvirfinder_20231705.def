@@ -51,10 +51,11 @@ From: ubuntu:20.04
 
         DeepVirFinder
 
-    COMMANDS:
+    INSTRUCTIONS:
 
-        # CheckV help menu
-        singularity run deepvirfinder_20230308.sif [COMMANDS]
+        # bind all directories used on the host system to the container before running
+        export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
+        singularity run deepvirfinder_20231705.sif dvf.py [-i INPUT_FA] [-o OUTPUT_DIR] [-l CUTOFF_LEN] [-c CORE_NUM]
 
 ############################################################################################
  

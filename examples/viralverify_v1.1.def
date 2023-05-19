@@ -20,7 +20,7 @@ From: ubuntu:22.04
     cd /software
     wget http://eddylab.org/software/hmmer/hmmer.tar.gz
     tar xvzf hmmer.tar.gz && cd hmmer-3.3.2/
-    ./configure --prefix=/software/hmmer-3.3.2 && make && make install
+    ./configure -&& make && make install
 
     cd /software 
     git clone https://github.com/hyattpd/Prodigal
@@ -29,7 +29,7 @@ From: ubuntu:22.04
 	cd /software
 	git clone https://github.com/ablab/viralVerify
 
-    cd /software && apt autoremove && apt clean && rm *.gz
+    cd /software && apt autoremove && apt clean && rm *.gz && rm -r hmmer-3.3.2/
 
 
 ##############################
@@ -38,7 +38,6 @@ From: ubuntu:22.04
 
 %environment
     export LC_ALL=C
-    export PATH=$PATH:/software/hmmer-3.3.2/bin
     export PATH=$PATH:/software/viralVerify
     export PATH=$PATH:/software/viralVerify/bin
     export PATH=$PATH:/software/viralVerify/scripts
@@ -56,7 +55,11 @@ From: ubuntu:22.04
 
     COMMANDS:
 
-        singularity run viralverify_20230311.sif [COMMANDS]
+    INSTRUCTIONS:
+
+        # bind all directories used on the host system to the container before running
+        export APPTAINER_BIND="HOST_DIRECTORY:/tmp"
+        singularity run viralverify_v1.1.sif [...]
 
 ############################################################################################
  
